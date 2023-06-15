@@ -279,9 +279,15 @@ class encrypted_authomata:# класс автоматов на подстано�
         return(result)
 
     
-d = encrypted_authomata(4, 1)
+d = encrypted_authomata(3, 1)
 d.generate()
-d.test_uniformity()
+experiment_num = int(input())
+if (experiment_num==1):
+    d.test_period()
+elif (experiment_num==2):
+    d.test_uniformity()
+else:
+    d.test_probability()
 #d.test(input, 1)
 
 
