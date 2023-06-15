@@ -1,7 +1,12 @@
-
+import random
+import secrets
 import math
+from itertools import permutations
+import secrets
+from numpy import random, char, unique, array, append, insert
+from scipy import stats
 
-class Permutation:
+class Permutation:#класс для генерации подстановок
 
     def __init__ (self, length):
         self._length = length 
@@ -47,35 +52,7 @@ class Permutation:
 
     
 
-class Combination:
-
-    def __init__ (self, m, n):
-        self._m = m
-        self._n = n
-        i=0
-        self.comb = [0]*m
-        while i<m:
-            self.comb[i]=i+1
-            i=i+1
-
-    def generate (self):
-        for i in range (self._m - 1, -1, -1):
-            if (self.comb[i] < self._n - self._m + i + 1):
-                self.comb[i] = self.comb[i]+1
-                for j in range (i, self._m - 1):
-                    self.comb[j+1] = self.comb[j]+1
-                return True   
-        return False
-
-    def print(self):
-        print(self.comb)
-
-    def get_comb(self):
-        return self.comb
-
-
-
-class state_table:
+class state_table:# класс таблица состояний
     def __init__(self, n, init_state):
         self._n = n
         self._init_state = init_state
@@ -85,45 +62,97 @@ class state_table:
         self._init_tate = obj2._init_state
         self.table = obj2.table.copy()
 
-    def combine (self, list_of_perm, combination):
-        i=97
-        for j in combination.get_comb():
-            self.table[chr(i)] = list_of_perm[j-1].copy()
-            i=i+1
-        print (self.table)
+    def combine (self, list_of_perm, part_perm):# функция класса формирует из подстановок таблицу состояний
+        i=1
+        for j in part_perm:
+           self.table[i] = list_of_perm[j-1].copy()
+           i=i+1
 
     def get_table(self):
         return self.table
 
-    def change_state (self, string):
+    
+    #def period_2 (self, string):
+    #    i=0
+    #    j=1
+    #    slow = self.table[self._init_state][ord(string[i%len(string)])-49]
+    #    print(slow)
+    #    fast = self.table[slow][ord(string[j%len(string)])-49]
+    #    print(fast)
+    #    i=i+1
+    #    j=j+1
+    #    while (fast!=slow):
+    #        slow = self.table[slow][ord(string[i%len(string)])-49]
+    #        i=i+1
+    #        print(slow)
+    #        fast = self.table[fast][ord(string[j%len(string)])-49]
+    #        j=j+1
+    #        fast = self.table[fast][ord(string[j%len(string)])-49]
+    #        j=j+1
+    #        print(fast)
+    #    print(i)
+    #    print(j)
+    #    first=0
+    #    i=0
+    #    slow = self._init_state
+    #    print('first')
+    #    while (slow!=fast):
+    #        slow = self.table[slow][ord(string[i%len(string)])-49]
+    #        i=i+1
+    #        print(slow)
+    #        fast = self.table[fast][ord(string[j%len(string)])-49]
+    #        print(fast)
+    #        j=j+1
+    #        first=first+1
+    #    print ('first=')
+    #    print (first)
+    #    length = 1
+    #    fast = self.table[slow][ord(string[i%len(string)])-49]
+    #    i=i+1
+    #    print(fast)
+    #    while (slow!=fast):
+    #        fast = self.table[fast][ord(string[i%len(string)])-49]
+    #        print(fast)
+    #        i=i+1
+    #        length = length + 1
+    #    print (length)
+
+
+    def change_state (self, string):# функция переходов автомата под действием входной последовательности
         res = str(self._init_state)
+        state = self._init_state
         for j in string:
-            res = res[0:] + str(self.table[j][self._init_state - 1])
-            self._init_state = self.table[j][self._init_state - 1]
-        print (res)
+            res = res[0:] + str(self.table[state][ord(j)-49])
+            state = self.table[state][ord(j)-49]
+        return (res)
 
-       
+    #def output(self, string, out_at):
+    #    out = ''
+    #    state = self._init_state
+    #    for j in string:
+    #        out = out[0:] + out_at[state][j]
+    #        state = self.table[state][j]
+    #    print(out)
+        
 
-
-class encrypted_authomates:
-    def __init__ (self, lenght, state):
-        self._lenght = lenght 
+        
+class encrypted_authomata:# класс автоматов на подстановках(всех возможных таблиц состояний)
+    def __init__ (self, length, state):
+        self._length = length 
         self._state = state
         self.list_of_tables = {}
 
         
-
     def generate (self):
-        list_of_perm = self.form_perm()
-        self.form_comb(list_of_perm)
-        for i in self.list_of_tables:
-            print (i,self.list_of_tables[i].table)
+        list_of_perm = self.form_perm()#формирование списка всех подстановок
+        self.form_comb(list_of_perm)#составление из подстановок таблиц переходов
+        #for i in self.list_of_tables:
+            #print (i,self.list_of_tables[i].table)
         
         
-       
     def form_perm (self):
-       a = Permutation (self._lenght)
-       fact = math.factorial(self._lenght)
+       a = Permutation (self._length)
+       fact = math.factorial(self._length)
        list_of_perm = [0]*fact
        i=0
        list_of_perm[i] = a.get_perm().copy()
@@ -135,32 +164,197 @@ class encrypted_authomates:
        return list_of_perm
 
     def form_comb(self, list_of_perm):
-        c = state_table(self._lenght, self._state)
-        fact = math.factorial(self._lenght)
-        b = Combination (self._lenght, fact)
+        number = []
+        j=0
+        while (j < math.factorial(self._length)):
+            number.append(j+1)
+            j+=1
+        c = state_table(self._length, self._state)
         i=0
-        c.combine(list_of_perm, b)
-        self.list_of_tables[i] = state_table(self._lenght, self._state)
-        self.list_of_tables[i].copy(c)
-        i=i+1
-        while (b.generate()):
-           c.combine (list_of_perm, b)
-           self.list_of_tables[i] = state_table(self._lenght, self._state)
+        # в цикле создаются всевозможные размещения из |s| по |s|!
+        # каждому числу в размещении соответсвует номер определнной подстановки
+        for part_perm in permutations(number, self._length):
+           c.combine (list_of_perm, part_perm)
+           self.list_of_tables[i] = state_table(self._length, self._state)
            self.list_of_tables[i].copy(c)
            i=i+1
 
-    def test (self, string):
-        c = state_table(self._lenght, self._state)
+
+    def test_period (self):#функция тестирования последовательности состояний на периодичность
+        period=input()
+        string = d.periodic_string(period)
+        print(string)
+        c = state_table(self._length, self._state)
         print ('')
         for i in self.list_of_tables:
             c = self.list_of_tables[i]
+
+            bijection = True
+            for j in range(self._length):
+                for k in range (1, self._length+1):
+                    for t in range(k+1, self._length+1):
+                        if c.table[k][j]==c.table[t][j]:
+                           bijection=False
+
             print (c.table)
-            c.change_state(string)
+            if bijection==True: print("биекция")
+            output = c.change_state(string)
+            print(output)
+            self.period(output)
+
+    def test_probability(self):#функция тестирования последовательности состояний на вероятности
+        length = int(input())
+        probabilities = [float(x) for x in input().split()]
+        string = d.prob_string(length, probabilities)
+
+        inp = array([ord(j)-48 for j in string], dtype = int)
+        elemnets, frequency = unique(inp, return_counts = True)
+        probabilities = frequency/len(inp) 
+        print('\n'+ string)
+        print(probabilities, '\n')
+       
+
+        j=0
+        for i in self.list_of_tables:
+            c = self.list_of_tables[i]
+            print (i, c.table)
+
+            row=[]
+            for k in range(0, self._length):
+                  elements, frequency = unique([c.table[j][k] for j in c.table], return_counts = True)
+                  row.append(frequency.tolist())
+                  count=1
+                  for j in range(len(elements)):
+                      if elements[j]!=j+count:
+                         row[len(row)-1].insert(j, 0)
+                         count+=1
+                  while (j+count!=self._length):
+                     row[len(row)-1].append(0)
+                     j+=1
 
 
-d = encrypted_authomates(3, 1)
+            estimateprob=[0]*self._length
+            for j in range(self._length):
+                for k in range(self._length):
+                   estimateprob[j]+=probabilities[k]*(row[k][j]/self._length)
+           
+            output = c.change_state(string)
+            print(output)
+            print(estimateprob)
+            self.probabilities(output)
+            print()
+
+    def test_uniformity (self):#функция тестирования последовательности состояний на равномерность распределения
+        length = int(input())
+        string = d.true_random_string(length)
+        print(string)
+        inseq = array([ord(j)-48 for j in string], dtype = int)
+        elements, frequency = unique(inseq, return_counts = True)
+        print(frequency/len(inseq))
+        print(stats.chisquare(frequency))
+        for i in self.list_of_tables:
+            c = self.list_of_tables[i]
+            print(i+1)
+            print (c.table)
+            output = c.change_state(string)
+            print(output)
+            self.uniformity(output)
+
+
+
+    def period(self, res):
+        
+        j=0
+        flag = False
+        while j!=len(res)-1 and flag!=True:#тестируем последовательности с началом во всех позициях
+            i=1
+            while (i!=len(res) - 1 and flag!=True):#i-длина проверяемой последовтельности
+               coincident = 0
+               begin = j+i
+               end = j+2*i
+               while (begin<len(res) and end<len(res)+1 and res[j:j+i]==res[begin:end]):# последовательно проверяем равенство всех частей длины i
+                  begin = end
+                  end = end+i
+                  coincident+=1
+               if (begin>=len(res) or end>=len(res)) and coincident>0:#если совпадения проследовали до конца последовательности, считаем период найденным
+                 flag = True
+                 print (i, j)
+               else:
+                 i=i+1#иначе увеличиваем длину
+            j+=1#иначе увеличиваем позицию старта (длина снова равна 2)        
+
+    def probabilities(self, res):#подсчет вероятностей
+        output = array([ord(j)-48 for j in res], dtype = int)
+        elements, frequency = unique(output, return_counts = True)
+        count=1
+        for j in range(len(elements)):
+            if elements[j]!=j+count:
+                frequency=insert(frequency, j, 0)
+                count+=1
+        while (j+count!=self._length):
+                frequency = append(frequency, 0)
+                j+=1
+        print(frequency/len(res))
+
+
+    def uniformity (self, res):#проверка гипотезы равномерности распределения (критерий хи-квадрат)
+        output = array([ord(j)-48 for j in res], dtype = int)
+        elemnets, frequency = unique(output, return_counts = True)
+        print(frequency/len(res))
+        print(stats.chisquare(frequency))
+        print()
+
+        #print (frequency)
+        #num = len(res)
+        #m = len(frequency)
+        #low = (num - 2.58 * math.sqrt(num * (2**m - 1)))/2**m
+        #upper = (num + 2.58 * math.sqrt(num * (2**m - 1)))/2**m
+        ##print (upper)
+        ##print (low)
+        #i=0
+        #result = True;
+        #for i in frequency:
+        #        probability = frequency[i]
+        #        if probability < low or probability > upper:
+        #          result = False
+        #print (result)
+
+
+    def prob_string (self, length, probabilities):#формирование строки с заданными веротностными характеристиками
+        values = [i for i in range(1, self._length+1)]
+        numbers = [i for i in range(self._length+1)]
+        discrete = stats.rv_discrete(
+        name='some_distribution', 
+        values=(values, probabilities))
+        distribution = discrete.rvs(size=length)
+        #uniform= random.randint(1, self._lenght+1, lenght)
+        distribution = char.mod('%d', distribution)
+        string = ''
+        for j in distribution:
+            string +=j 
+        return (string)
+
+    def random_string(self, length):
+        values = [chr(i+48) for i in range(1, self._length+1)]
+        print(values)
+        string = ''.join(secrets.choice(values) for i in range(length))
+        return(string)
+
+    def periodic_string(self, string):
+        result = string*(self._length*len(string)+(self._length-1)*len(string))
+        return(result)
+
+    
+d = encrypted_authomata(4, 1)
 d.generate()
-d.test('bcbc')
+d.test_uniformity()
+#d.test(input, 1)
+
+
+
+
+
+
 
 
 
