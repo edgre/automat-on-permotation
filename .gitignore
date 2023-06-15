@@ -1,2 +1,6 @@
 
 .vs/
+./*.sln
+./*.csproj
+*.sln
+*.csproj

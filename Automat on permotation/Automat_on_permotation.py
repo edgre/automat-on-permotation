@@ -72,50 +72,6 @@ class state_table:# класс таблица состояний
         return self.table
 
     
-    #def period_2 (self, string):
-    #    i=0
-    #    j=1
-    #    slow = self.table[self._init_state][ord(string[i%len(string)])-49]
-    #    print(slow)
-    #    fast = self.table[slow][ord(string[j%len(string)])-49]
-    #    print(fast)
-    #    i=i+1
-    #    j=j+1
-    #    while (fast!=slow):
-    #        slow = self.table[slow][ord(string[i%len(string)])-49]
-    #        i=i+1
-    #        print(slow)
-    #        fast = self.table[fast][ord(string[j%len(string)])-49]
-    #        j=j+1
-    #        fast = self.table[fast][ord(string[j%len(string)])-49]
-    #        j=j+1
-    #        print(fast)
-    #    print(i)
-    #    print(j)
-    #    first=0
-    #    i=0
-    #    slow = self._init_state
-    #    print('first')
-    #    while (slow!=fast):
-    #        slow = self.table[slow][ord(string[i%len(string)])-49]
-    #        i=i+1
-    #        print(slow)
-    #        fast = self.table[fast][ord(string[j%len(string)])-49]
-    #        print(fast)
-    #        j=j+1
-    #        first=first+1
-    #    print ('first=')
-    #    print (first)
-    #    length = 1
-    #    fast = self.table[slow][ord(string[i%len(string)])-49]
-    #    i=i+1
-    #    print(fast)
-    #    while (slow!=fast):
-    #        fast = self.table[fast][ord(string[i%len(string)])-49]
-    #        print(fast)
-    #        i=i+1
-    #        length = length + 1
-    #    print (length)
 
 
     def change_state (self, string):# функция переходов автомата под действием входной последовательности
@@ -126,13 +82,7 @@ class state_table:# класс таблица состояний
             state = self.table[state][ord(j)-49]
         return (res)
 
-    #def output(self, string, out_at):
-    #    out = ''
-    #    state = self._init_state
-    #    for j in string:
-    #        out = out[0:] + out_at[state][j]
-    #        state = self.table[state][j]
-    #    print(out)
+
         
 
         
@@ -303,22 +253,6 @@ class encrypted_authomata:# класс автоматов на подстано�
         print(frequency/len(res))
         print(stats.chisquare(frequency))
         print()
-
-        #print (frequency)
-        #num = len(res)
-        #m = len(frequency)
-        #low = (num - 2.58 * math.sqrt(num * (2**m - 1)))/2**m
-        #upper = (num + 2.58 * math.sqrt(num * (2**m - 1)))/2**m
-        ##print (upper)
-        ##print (low)
-        #i=0
-        #result = True;
-        #for i in frequency:
-        #        probability = frequency[i]
-        #        if probability < low or probability > upper:
-        #          result = False
-        #print (result)
-
 
     def prob_string (self, length, probabilities):#формирование строки с заданными веротностными характеристиками
         values = [i for i in range(1, self._length+1)]
